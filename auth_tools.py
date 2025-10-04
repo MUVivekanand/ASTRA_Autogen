@@ -18,7 +18,7 @@ CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
 TOKEN_FILE = Path(__file__).parent / ".token.json"
 
-
+#as scopes is required
 SCOPES = [
     "openid",
     "https://www.googleapis.com/auth/userinfo.email",
@@ -31,7 +31,7 @@ if TOKEN_FILE.exists() and TOKEN_FILE.stat().st_size > 0:
         token_data = json.loads(TOKEN_FILE.read_text())
         creds = Credentials.from_authorized_user_info(token_data, SCOPES)
     except json.JSONDecodeError:
-        print("⚠️ .token.json is empty or invalid. Please re-authenticate.")
+        print(".token.json is empty or invalid. Please re-authenticate.")
 
 
 @mcp.tool()
@@ -56,10 +56,8 @@ async def authenticate() -> str:
         redirect_uri=REDIRECT_URI,
     )
 
-    # Generate authorization URL
     auth_url, _ = flow.authorization_url(prompt="consent", access_type="offline")
 
-    # Try to open browser automatically
     try:
         webbrowser.open(auth_url)
         browser_opened = True

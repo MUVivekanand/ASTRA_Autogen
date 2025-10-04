@@ -1,13 +1,5 @@
 .env
 .venv/
-venv/
-ENV/
 __pycache__/
-*.py[cod]
-*$py.class
-.Python
-*.so
-.pytest_cache/
-.coverage
-htmlcov/
 .token.json
+policies/opa.exe
