@@ -1,14 +1,12 @@
-# main.py
 import asyncio
-from agents import create_auth_agent, create_mcp_agent
-from runners import run_auth_agent, run_mcp_agent
-from utils import is_authenticated
+from agents.agents import create_auth_agent, create_mcp_agent
+from utils.runners import run_auth_agent, run_mcp_agent
+from utils.utils import is_authenticated
 
 
 async def main() -> None:
     """Main execution flow with two-agent system"""
     
-    # Check if already authenticated
     if is_authenticated():
         print("Already authenticated. Skipping to MCP Agent...")
         auth_successful = True

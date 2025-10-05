@@ -1,8 +1,7 @@
-# runners.py
 from autogen_agentchat.agents import AssistantAgent
 from autogen_core import CancellationToken
 from autogen_agentchat.ui import Console
-from utils import is_authenticated
+from utils.utils import is_authenticated
 
 
 async def run_auth_agent(auth_agent: AssistantAgent) -> bool:
@@ -14,7 +13,7 @@ async def run_auth_agent(auth_agent: AssistantAgent) -> bool:
     for tool in auth_agent._tools:
         desc = getattr(tool, "description", "No description")
         print(f"- {tool.name}: {desc}")
-    print("\nType 'auth' to start authentication process.\n")
+    print("\nType 'authenticate' to start authentication process.\n")
 
     while not is_authenticated():
         user_input = input("Auth> ").strip()
@@ -32,9 +31,8 @@ async def run_auth_agent(auth_agent: AssistantAgent) -> bool:
             )
         )
         
-        # Check authentication status after each interaction
         if is_authenticated():
-            print("\n✓ Authentication successful!")
+            print("\nAuthentication successful!")
             return True
         else:
             print("\nAuthentication not yet complete. Please continue...")

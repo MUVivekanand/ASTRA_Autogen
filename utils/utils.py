@@ -1,9 +1,7 @@
-# utils.py
 import json
 from pathlib import Path
 
-TOKEN_FILE = Path(".token.json")
-
+TOKEN_FILE = Path(__file__).parent.parent / ".token.json"
 
 def is_authenticated() -> bool:
     """Check if user is authenticated by verifying token file"""

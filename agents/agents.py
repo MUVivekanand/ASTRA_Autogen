@@ -1,6 +1,4 @@
-# agents.py
 import os
-from pathlib import Path
 from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
 from autogen_ext.tools.mcp import StdioServerParams, mcp_server_tools, SseMcpToolAdapter, SseServerParams
 from autogen_agentchat.agents import AssistantAgent
@@ -12,6 +10,8 @@ AZURE_API_KEY = os.getenv("AZURE_KEY")
 AZURE_API_ENDPOINT = os.getenv("AZURE_ENDPOINT")
 AZURE_DEPLOYMENT = os.getenv("AZURE_DEPLOYMENT")
 APIFY_API_KEY = os.getenv("APIFY_API_KEY")
+
+print(APIFY_API_KEY)
 
 if not APIFY_API_KEY:
     raise ValueError("APIFY_API_KEY environment variable is not set.")
@@ -35,8 +35,9 @@ async def create_auth_agent():
     """Create authentication agent with only auth tools"""
     print("Initializing Authentication Agent...")
     
+    auth_server_path = os.path.join(os.path.dirname(__file__), "..", "mcp", "auth_tools.py")
     auth_server = StdioServerParams(
-        command="python", args=["auth_tools.py"]
+        command="python", args=[auth_server_path]
     )
     auth_tools = await mcp_server_tools(auth_server)
     
@@ -63,8 +64,9 @@ async def create_mcp_agent():
     print("Initializing MCP Agent with all tools...")
     
     # Load math tools
+    math_server_path = os.path.join(os.path.dirname(__file__), "..", "mcp", "math_server.py")
     math_server = StdioServerParams(
-        command="python", args=["math_server.py"]
+        command="python", args=[math_server_path]
     )
     math_tools = await mcp_server_tools(math_server)
     

@@ -15,8 +15,10 @@ mcp = FastMCP(name = "simple-mcp")
 CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 
+print(CLIENT_ID)
+
 REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
-TOKEN_FILE = Path(__file__).parent / ".token.json"
+TOKEN_FILE = Path(__file__).parent.parent / ".token.json"
 
 #as scopes is required
 SCOPES = [
