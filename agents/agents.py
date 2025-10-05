@@ -11,8 +11,6 @@ AZURE_API_ENDPOINT = os.getenv("AZURE_ENDPOINT")
 AZURE_DEPLOYMENT = os.getenv("AZURE_DEPLOYMENT")
 APIFY_API_KEY = os.getenv("APIFY_API_KEY")
 
-print(APIFY_API_KEY)
-
 if not APIFY_API_KEY:
     raise ValueError("APIFY_API_KEY environment variable is not set.")
 
@@ -24,7 +22,7 @@ async def create_model_client():
     """Create Azure OpenAI model client"""
     return AzureOpenAIChatCompletionClient(
         api_key=AZURE_API_KEY,
-        model="gpt-4o",
+        model="gpt-4o-2024-05-13",
         azure_deployment=AZURE_DEPLOYMENT,
         azure_endpoint=AZURE_API_ENDPOINT,
         api_version="2023-03-15-preview"
