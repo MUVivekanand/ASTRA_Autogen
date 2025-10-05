@@ -1,7 +1,7 @@
 import asyncio
 from agents.agents import create_auth_agent, create_mcp_agent
 from utils.runners import run_auth_agent, run_mcp_agent
-from utils.utils import is_authenticated
+from utils.check import is_authenticated
 
 
 async def main() -> None:

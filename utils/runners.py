@@ -1,7 +1,7 @@
 from autogen_agentchat.agents import AssistantAgent
 from autogen_core import CancellationToken
 from autogen_agentchat.ui import Console
-from utils.utils import is_authenticated
+from utils.check import is_authenticated
 
 
 async def run_auth_agent(auth_agent: AssistantAgent) -> bool:
