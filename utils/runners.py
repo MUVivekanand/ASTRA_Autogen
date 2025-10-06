@@ -2,7 +2,7 @@ from autogen_agentchat.agents import AssistantAgent
 from autogen_core import CancellationToken
 from autogen_agentchat.ui import Console
 from utils.check import is_authenticated
-
+from utils.opa import check_with_opa
 
 async def run_auth_agent(auth_agent: AssistantAgent) -> bool:
     """Run authentication agent until successful authentication"""
@@ -56,6 +56,10 @@ async def run_mcp_agent(mcp_agent: AssistantAgent):
         if user_input.lower() in {"exit", "quit"}:
             print("Agent stopped!")
             break
+
+        if not check_with_opa(user_input):
+            print("Request blocked by OPA policy")
+            continue
 
         await Console(
             mcp_agent.run_stream(
