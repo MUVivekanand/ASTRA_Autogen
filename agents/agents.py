@@ -63,10 +63,20 @@ async def create_mcp_agent():
     
     # Load math tools
     math_server_path = os.path.join(os.path.dirname(__file__), "..", "mcp", "math_server.py")
+
+    mongo_server_path = os.path.join(os.path.dirname(__file__), "..", "mcp", "mongo_db.py")
+
     math_server = StdioServerParams(
         command="python", args=[math_server_path]
     )
+
+    mongo_server = StdioServerParams(
+        command="python", args=[mongo_server_path]
+    )
+
     math_tools = await mcp_server_tools(math_server)
+
+    mongo_tools = await mcp_server_tools(mongo_server)
     
     # Load Apify tools
     server_params = SseServerParams(
@@ -84,12 +94,13 @@ async def create_mcp_agent():
     return AssistantAgent(
         name="mcp_agent",
         model_client=model_client,
-        tools=math_tools + [apify_adapter],
+        tools=mongo_tools + math_tools + [apify_adapter],
         reflect_on_tool_use=True,
         system_message=(
             "You are an intelligent assistant with access to mathematical computation tools "
             "and web browsing capabilities. "
-            "Use the available tools to help users with calculations, data analysis, "
+            "You can modify/create/edit documents of mongodb collections with the mcp tool of mongo db"
+            "Use the available tools to help users with calculations, data analysis, etc."
             "and information gathering from the web. "
             "Provide clear and helpful responses."
         ),
