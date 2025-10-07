@@ -6,5 +6,5 @@ default allow := false
 
 allow if {
     input.is_authenticated == true
-    input.is_admin == true
+    input.role == "admin"
 }

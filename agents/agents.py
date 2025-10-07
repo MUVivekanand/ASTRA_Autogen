@@ -79,22 +79,22 @@ async def create_mcp_agent():
     mongo_tools = await mcp_server_tools(mongo_server)
     
     # Load Apify tools
-    server_params = SseServerParams(
-        url="https://rag-web-browser.apify.actor/sse",
-        headers={"Authorization": f"Bearer {APIFY_API_KEY}"},
-        timeout=30,
-    )
-    apify_adapter = await SseMcpToolAdapter.from_server_params(
-        server_params,
-        "rag-web-browser",
-    )
+    # server_params = SseServerParams(
+    #     url="https://rag-web-browser.apify.actor/sse",
+    #     headers={"Authorization": f"Bearer {APIFY_API_KEY}"},
+    #     timeout=30,
+    # )
+    # apify_adapter = await SseMcpToolAdapter.from_server_params(
+    #     server_params,
+    #     "rag-web-browser",
+    # )
     
     model_client = await create_model_client()
     
     return AssistantAgent(
         name="mcp_agent",
         model_client=model_client,
-        tools=mongo_tools + math_tools + [apify_adapter],
+        tools=mongo_tools + math_tools,
         reflect_on_tool_use=True,
         system_message=(
             "You are an intelligent assistant with access to mathematical computation tools "

@@ -12,35 +12,68 @@ def check_with_opa(prompt: str) -> bool:
     """Send prompt to OPA and get allow/deny decision"""
     mongo_client = MongoClient(MONGO_URI)
     email = None
-    is_admin = False
+    role = ""  # Default to empty string instead of None
 
     db = mongo_client["test"]
     users = db["users"]  
 
+    print("=" * 50)
+    print("Starting OPA check...")
+    print(f"Is authenticated: {is_authenticated()}")
+
     if is_authenticated():
         user = get_authenticated_user_info()
-        email = user['email']
+        print(f"User info from token: {user}")
+
+        email = user.get('email')
+        print(f"Email extracted from token: '{email}'")
+
         if email:
-            user_doc = users.find_one({"email": email})
-            if user_doc and "is_admin" in user_doc:
-                is_admin = user_doc["is_admin"]
+            # Query using email_id instead of email
+            print(f"\nQuerying MongoDB for email_id: '{email}'")
+            user_doc = users.find_one({"email_id": email})  # Changed from "email" to "email_id"
+            print(f"User document found: {user_doc}")
+
+            if user_doc:
+                print(f"✓ User document found!")
+                print(f"All fields in document: {list(user_doc.keys())}")
+
+                if "role" in user_doc:
+                    role = user_doc["role"]
+                    print(f"✓ Role extracted: '{role}'")
+                else:
+                    print(f"✗ No 'role' field found in user document")
+            else:
+                print(f"✗ No user found in database with email_id: '{email}'")
+        else:
+            print("✗ No email found in user info")
+    else:
+        print("✗ User is not authenticated")
 
     input_data = {
         "input": {
             "prompt": prompt,
             "is_authenticated": is_authenticated(),
-            "is_admin": is_admin
+            "role": role if role else ""
         }
     }
-    print(is_authenticated(), is_admin)
-    
+
+    print(f"\nFinal values being sent to OPA:")
+    print(f"  - is_authenticated: {is_authenticated()}")
+    print(f"  - role: '{role}'")
+    print(f"  - prompt: '{prompt[:50]}...' (truncated)")
+    print("=" * 50)
+
     try:
         resp = requests.post("http://localhost:8181/v1/data/prompt/allow", json=input_data)
         resp.raise_for_status()
         decision = resp.json()
-        return decision.get("result", False)
+        print(f"\nOPA Response: {decision}")
+        result = decision.get("result", False)
+        print(f"OPA Decision: {'ALLOWED ✓' if result else 'DENIED ✗'}")
+        return result
     except Exception as e:
-        print(f"OPA check failed: {e}")
+        print(f"\n✗ OPA check failed: {e}")
         return False
-
-check_with_opa("Sridev")
+    finally:
+        mongo_client.close()
