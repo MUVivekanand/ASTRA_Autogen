@@ -9,10 +9,6 @@ load_dotenv()
 AZURE_API_KEY = os.getenv("AZURE_KEY")
 AZURE_API_ENDPOINT = os.getenv("AZURE_ENDPOINT")
 AZURE_DEPLOYMENT = os.getenv("AZURE_DEPLOYMENT")
-APIFY_API_KEY = os.getenv("APIFY_API_KEY")
-
-if not APIFY_API_KEY:
-    raise ValueError("APIFY_API_KEY environment variable is not set.")
 
 if not AZURE_API_KEY or not AZURE_API_ENDPOINT or not AZURE_DEPLOYMENT:
     raise ValueError("Azure API credentials are not set.")

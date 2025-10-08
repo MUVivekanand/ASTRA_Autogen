@@ -13,8 +13,6 @@ mcp = FastMCP(name="mongodb-mcp")
 
 # MongoDB configuration
 MONGO_URI = os.getenv("MONGO_URI")
-print(MONGO_URI)
-# Global MongoDB client
 mongo_client: Optional[MongoClient] = None
 
 
@@ -22,7 +20,7 @@ def get_mongo_client() -> MongoClient:
     """Get or create MongoDB client"""
     global mongo_client
     if mongo_client is None:
-        mongo_client = MongoClient(MONGO_URI)
+         mongo_client = MongoClient(MONGO_URI)
     return mongo_client
 
 
@@ -48,9 +46,6 @@ def serialize_document(doc: Dict[str, Any]) -> Dict[str, Any]:
 async def list_databases() -> str:
     """
     List all databases in MongoDB instance
-    
-    Returns:
-        JSON string containing list of database names
     """
     try:
         client = get_mongo_client()
@@ -67,12 +62,6 @@ async def list_databases() -> str:
 async def list_collections(database_name: str) -> str:
     """
     List all collections in a specific database
-    
-    Args:
-        database_name: Name of the database
-    
-    Returns:
-        JSON string containing list of collection names
     """
     try:
         client = get_mongo_client()
@@ -96,15 +85,6 @@ async def find_documents(
 ) -> str:
     """
     Find documents in a collection
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection
-        filter_query: Optional JSON string for MongoDB query filter (e.g., '{"name": "John"}')
-        limit: Maximum number of documents to return (default: 10)
-    
-    Returns:
-        JSON string containing matching documents
     """
     try:
         client = get_mongo_client()
@@ -142,14 +122,6 @@ async def insert_document(
 ) -> str:
     """
     Insert a new document into a collection
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection
-        document: JSON string of the document to insert
-    
-    Returns:
-        JSON string with insertion result including inserted_id
     """
     try:
         client = get_mongo_client()
@@ -183,14 +155,6 @@ async def insert_many_documents(
 ) -> str:
     """
     Insert multiple documents into a collection
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection
-        documents: JSON string array of documents to insert
-    
-    Returns:
-        JSON string with insertion results
     """
     try:
         client = get_mongo_client()
@@ -229,16 +193,6 @@ async def update_document(
 ) -> str:
     """
     Update a single document in a collection
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection
-        filter_query: JSON string for MongoDB query filter
-        update_data: JSON string for update operations (e.g., '{"$set": {"name": "Jane"}}')
-        upsert: If True, insert document if not found (default: False)
-    
-    Returns:
-        JSON string with update result
     """
     try:
         client = get_mongo_client()
@@ -276,15 +230,6 @@ async def update_many_documents(
 ) -> str:
     """
     Update multiple documents in a collection
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection
-        filter_query: JSON string for MongoDB query filter
-        update_data: JSON string for update operations
-    
-    Returns:
-        JSON string with update result
     """
     try:
         client = get_mongo_client()
@@ -320,14 +265,6 @@ async def delete_document(
 ) -> str:
     """
     Delete a single document from a collection
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection
-        filter_query: JSON string for MongoDB query filter
-    
-    Returns:
-        JSON string with deletion result
     """
     try:
         client = get_mongo_client()
@@ -361,14 +298,6 @@ async def delete_many_documents(
 ) -> str:
     """
     Delete multiple documents from a collection
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection
-        filter_query: JSON string for MongoDB query filter
-    
-    Returns:
-        JSON string with deletion result
     """
     try:
         client = get_mongo_client()
@@ -402,14 +331,6 @@ async def count_documents(
 ) -> str:
     """
     Count documents in a collection
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection
-        filter_query: Optional JSON string for MongoDB query filter
-    
-    Returns:
-        JSON string with document count
     """
     try:
         client = get_mongo_client()
@@ -444,13 +365,6 @@ async def create_collection(
 ) -> str:
     """
     Create a new collection in a database
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection to create
-    
-    Returns:
-        Success message
     """
     try:
         client = get_mongo_client()
@@ -473,13 +387,6 @@ async def drop_collection(
 ) -> str:
     """
     Drop (delete) a collection from a database
-    
-    Args:
-        database_name: Name of the database
-        collection_name: Name of the collection to drop
-    
-    Returns:
-        Success message
     """
     try:
         client = get_mongo_client()
