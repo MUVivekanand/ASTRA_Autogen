@@ -4,6 +4,8 @@ from autogen_agentchat.ui import Console
 from utils.check import is_authenticated
 from utils.opa import check_with_opa
 
+import json,re
+
 async def run_auth_agent(auth_agent: AssistantAgent) -> bool:
     """Run authentication agent until successful authentication"""
     print("\n=== AUTHENTICATION REQUIRED ===")
@@ -67,3 +69,22 @@ async def run_mcp_agent(mcp_agent: AssistantAgent):
                 cancellation_token=CancellationToken(),
             )
         )
+
+
+async def run_tool_agent(tool_detection_agent: AssistantAgent) -> dict:
+    response_text = await Console(tool_detection_agent.run_stream(
+        cancellation_token=CancellationToken()
+    ))
+    
+    # Convert to string and strip whitespace
+    response_text = str(response_text.messages[0].content).strip()
+    print("\nTool Detection Agent Response:\n", response_text) 
+    """Extract first JSON object from a string and parse it."""
+    try:
+        # Match curly braces content
+        match = re.search(r'\{.*\}', response_text, re.DOTALL)
+        if match:
+            return json.loads(match.group(0))
+    except json.JSONDecodeError:
+        print("⚠ JSON extraction failed. Raw output:\n", response_text)
+    return {"tool_name": "", "tool_type": ""}

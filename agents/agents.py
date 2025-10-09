@@ -101,3 +101,62 @@ async def create_mcp_agent():
             "Provide clear and helpful responses."
         ),
     )
+
+async def create_tool_agent():
+    """
+    Create a lightweight AI agent to detect the tool from a natural language prompt.
+    Returns an AssistantAgent instance.
+    """
+    print("Initializing Tool Detection Agent...")
+
+    # Prepare system message to guide the AI
+    system_message = (
+        "You are a tool detection assistant.\n"
+        "Given a user's natural language instruction, identify the single most appropriate "
+        "MongoDB tool that should be used and classify it as either 'read_only' or 'write'.\n\n"
+        
+        "Available READ-ONLY tools:\n"
+        "- list_databases: List all available databases\n"
+        "- list_collections: List all collections in a database\n"
+        "- find_documents: Query and retrieve documents from a collection\n"
+        "- count_documents: Count documents matching a query\n\n"
+        
+        "Available WRITE tools:\n"
+        "- insert_document: Insert a single document into a collection\n"
+        "- insert_many_documents: Insert multiple documents into a collection\n"
+        "- update_document: Update a single document in a collection\n"
+        "- update_many_documents: Update multiple documents in a collection\n"
+        "- delete_document: Delete a single document from a collection\n"
+        "- delete_many_documents: Delete multiple documents from a collection\n"
+        "- create_collection: Create a new collection in a database\n"
+        "- drop_collection: Drop/delete an entire collection\n\n"
+        
+        "Instructions:\n"
+        "1. Analyze the user's instruction carefully\n"
+        "2. Select exactly ONE tool from the lists above\n"
+        "3. Set tool_type to 'read_only' if the tool is from the READ-ONLY list\n"
+        "4. Set tool_type to 'write' if the tool is from the WRITE list\n"
+        "5. If no tool matches, return {\"tool_name\": \"\", \"tool_type\": \"\"}\n"
+        "6. Output MUST be valid JSON only - no explanations, no extra text\n\n"
+        
+        "Return your response as strict JSON only, exactly like this:\n"
+        '{"tool_name": "<tool_name>", "tool_type": "read_only"}\n'
+        "OR\n"
+        '{"tool_name": "<tool_name>", "tool_type": "write"}\n\n'
+        
+        "Examples:\n"
+        "User: 'Show me all databases' → {\"tool_name\": \"list_databases\", \"tool_type\": \"read_only\"}\n"
+        "User: 'Add a new user to the users collection' → {\"tool_name\": \"insert_document\", \"tool_type\": \"write\"}\n"
+        "User: 'How many products are there?' → {\"tool_name\": \"count_documents\", \"tool_type\": \"read_only\"}\n"
+        "User: 'Delete all old records' → {\"tool_name\": \"delete_many_documents\", \"tool_type\": \"write\"}\n"
+        "User: 'List all the documents' → {\"tool_name\": \"list_documents\", \"tool_type\": \"read_only\"}\n"
+    )
+
+    model_client = await create_model_client()
+
+    return AssistantAgent(
+        name="tool_detection_agent",
+        model_client=model_client,
+        system_message=system_message,
+        reflect_on_tool_use=False
+    )

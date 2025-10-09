@@ -8,57 +8,63 @@ import os
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 
-def check_with_opa(prompt: str) -> bool:
-    """Send prompt to OPA and get allow/deny decision"""
+def check_with_opa(tool: str, prompt: str = "") -> bool:
+    """
+    Send the canonical tool + user info to OPA and get allow/deny decision.
+    Args:
+        tool: canonical tool name detected by AI agent
+        prompt: optional user prompt (for logging)
+    Returns:
+        bool: True if allowed, False if denied
+    """
     mongo_client = MongoClient(MONGO_URI)
-    email = None
     role = ""
 
-    db = mongo_client["test"]
-    users = db["users"]  
-
-    print("=" * 50)
-    print("Starting OPA check...")
-
-    if is_authenticated():
-        user = get_authenticated_user_info()
-
-        email = user.get('email')
-        print(f"Email extracted from token: '{email}'")
-
-        if email:
-            user_doc = users.find_one({"email_id": email})
-
-            if user_doc:
-                if "role" in user_doc:
-                    role = user_doc["role"]
-                    print(f"Role extracted: '{role}'")
-                else:
-                    print(f"No 'role' field found in user document")
-            else:
-                print(f"No user found in database with email_id: '{email}'")
-        else:
-            print("No email found in user info")
-    else:
-        print("User is not authenticated")
-
-    input_data = {
-        "input": {
-            "prompt": prompt,
-            "is_authenticated": is_authenticated(),
-            "role": role if role else ""
-        }
-    }
-
     try:
-        resp = requests.post("http://localhost:8181/v1/data/prompt/allow", json=input_data)
+        if not is_authenticated():
+            print("✗ User not authenticated")
+            return False
+
+        user_info = get_authenticated_user_info()
+        email = user_info.get("email")
+        print(f"User email from token: {email}")
+
+        if not email:
+            print("✗ No email found in user info")
+            return False
+
+        db = mongo_client["test"]
+        users = db["users"]
+        user_doc = users.find_one({"email_id": email})
+        if not user_doc:
+            print(f"✗ No user found in DB with email_id: {email}")
+            return False
+
+        role = user_doc.get("role", "")
+        print(f"User role: {role}")
+
+        input_data = {
+            "input": {
+                "is_authenticated": True,
+                "role": role,
+                "tool": tool
+            }
+        }
+
+        print(f"\nSending to OPA: {input_data}")
+        resp = requests.post(
+            "http://localhost:8181/v1/data/mcp_tools/allow",
+            json=input_data,
+            timeout=5
+        )
         resp.raise_for_status()
         decision = resp.json()
-        print(f"\nOPA Response: {decision}")
-        result = decision.get("result", False)
-        return result
+        allowed = decision.get("result", False)
+        print(f"OPA Decision: {'ALLOWED ✓' if allowed else 'DENIED ✗'}")
+        return allowed
+
     except Exception as e:
-        print(f"\nOPA check failed: {e}")
+        print(f"✗ OPA check failed: {e}")
         return False
     finally:
         mongo_client.close()
