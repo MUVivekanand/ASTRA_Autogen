@@ -1,6 +1,6 @@
 import os
 from autogen_ext.models.openai import AzureOpenAIChatCompletionClient
-from autogen_ext.tools.mcp import StdioServerParams, mcp_server_tools, SseMcpToolAdapter, SseServerParams
+from autogen_ext.tools.mcp import StdioServerParams, mcp_server_tools
 from autogen_agentchat.agents import AssistantAgent
 from dotenv import load_dotenv
 
@@ -54,7 +54,7 @@ async def create_auth_agent():
 
 
 async def create_mcp_agent():
-    """Create MCP agent with math and Apify tools"""
+    """Create MCP agent with math and mongodb tools"""
     print("Initializing MCP Agent with all tools...")
     
     # Load math tools
@@ -105,11 +105,9 @@ async def create_mcp_agent():
 async def create_tool_agent():
     """
     Create a lightweight AI agent to detect the tool from a natural language prompt.
-    Returns an AssistantAgent instance.
     """
     print("Initializing Tool Detection Agent...")
 
-    # Prepare system message to guide the AI
     system_message = (
         "You are a tool detection assistant.\n"
         "Given a user's natural language instruction, identify the single most appropriate "

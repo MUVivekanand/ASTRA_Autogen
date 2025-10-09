@@ -8,21 +8,16 @@ import os
 load_dotenv()
 MONGO_URI = os.getenv("MONGO_URI")
 
-def check_with_opa(tool: str, prompt: str = "") -> bool:
+def check_with_opa(tool: str) -> bool:
     """
     Send the canonical tool + user info to OPA and get allow/deny decision.
-    Args:
-        tool: canonical tool name detected by AI agent
-        prompt: optional user prompt (for logging)
-    Returns:
-        bool: True if allowed, False if denied
     """
     mongo_client = MongoClient(MONGO_URI)
     role = ""
 
     try:
         if not is_authenticated():
-            print("✗ User not authenticated")
+            print("User not authenticated")
             return False
 
         user_info = get_authenticated_user_info()
@@ -30,14 +25,14 @@ def check_with_opa(tool: str, prompt: str = "") -> bool:
         print(f"User email from token: {email}")
 
         if not email:
-            print("✗ No email found in user info")
+            print("No email found in user info")
             return False
 
         db = mongo_client["test"]
         users = db["users"]
         user_doc = users.find_one({"email_id": email})
         if not user_doc:
-            print(f"✗ No user found in DB with email_id: {email}")
+            print(f"No user found in DB with email_id: {email}")
             return False
 
         role = user_doc.get("role", "")
@@ -60,11 +55,11 @@ def check_with_opa(tool: str, prompt: str = "") -> bool:
         resp.raise_for_status()
         decision = resp.json()
         allowed = decision.get("result", False)
-        print(f"OPA Decision: {'ALLOWED ✓' if allowed else 'DENIED ✗'}")
+        print(f"OPA Decision: {'ALLOWED' if allowed else 'DENIED'}")
         return allowed
 
     except Exception as e:
-        print(f"✗ OPA check failed: {e}")
+        print(f"OPA check failed: {e}")
         return False
     finally:
         mongo_client.close()

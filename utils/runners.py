@@ -42,7 +42,7 @@ async def run_auth_agent(auth_agent: AssistantAgent) -> bool:
     return True
 
 
-async def run_mcp_agent(mcp_agent: AssistantAgent):
+async def run_mcp_agent(mcp_agent: AssistantAgent, tool_detection_agent: AssistantAgent):
     """Run main MCP agent with all tools enabled"""
     print("\n=== MCP AGENT ACTIVE ===")
     print("\nAvailable Tools:")
@@ -59,7 +59,17 @@ async def run_mcp_agent(mcp_agent: AssistantAgent):
             print("Agent stopped!")
             break
 
-        if not check_with_opa(user_input):
+        detected_tool_info = await run_tool_agent(tool_detection_agent)
+        tool_name = detected_tool_info.get("tool_name", "")
+        tool_type = detected_tool_info.get("tool_type", "")
+
+        if not tool_name:
+            print("Could not detect an appropriate tool")
+            continue
+
+        print(f"\nDetected Tool: {tool_name} (Type: {tool_type})")
+
+        if not check_with_opa(tool=tool_name):
             print("Request blocked by OPA policy")
             continue
 
@@ -76,15 +86,13 @@ async def run_tool_agent(tool_detection_agent: AssistantAgent) -> dict:
         cancellation_token=CancellationToken()
     ))
     
-    # Convert to string and strip whitespace
     response_text = str(response_text.messages[0].content).strip()
-    print("\nTool Detection Agent Response:\n", response_text) 
-    """Extract first JSON object from a string and parse it."""
+
     try:
-        # Match curly braces content
         match = re.search(r'\{.*\}', response_text, re.DOTALL)
         if match:
             return json.loads(match.group(0))
     except json.JSONDecodeError:
-        print("⚠ JSON extraction failed. Raw output:\n", response_text)
+        print("JSON extraction failed. Raw output:\n", response_text)
+
     return {"tool_name": "", "tool_type": ""}
