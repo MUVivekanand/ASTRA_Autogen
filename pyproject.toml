@@ -20,5 +20,6 @@ dependencies = [
     "google-auth-oauthlib>=1.2.2",
     "google-api-python-client>=2.183.0",
     "pymongo>=4.15.2",
+    "numpy>=2.3.3",
 ]
 

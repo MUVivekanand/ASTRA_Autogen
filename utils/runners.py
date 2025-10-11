@@ -3,8 +3,7 @@ from autogen_core import CancellationToken
 from autogen_agentchat.ui import Console
 from utils.check import is_authenticated
 from utils.opa import check_with_opa
-
-import json,re
+from embeddings.tools_embedding import llm_embeddings, global_tool_embeddings
 
 async def run_auth_agent(auth_agent: AssistantAgent) -> bool:
     """Run authentication agent until successful authentication"""
@@ -42,7 +41,7 @@ async def run_auth_agent(auth_agent: AssistantAgent) -> bool:
     return True
 
 
-async def run_mcp_agent(mcp_agent: AssistantAgent, tool_detection_agent: AssistantAgent):
+async def run_mcp_agent(mcp_agent: AssistantAgent):
     """Run main MCP agent with all tools enabled"""
     print("\n=== MCP AGENT ACTIVE ===")
     print("\nAvailable Tools:")
@@ -59,15 +58,8 @@ async def run_mcp_agent(mcp_agent: AssistantAgent, tool_detection_agent: Assista
             print("Agent stopped!")
             break
 
-        detected_tool_info = await run_tool_agent(tool_detection_agent)
-        tool_name = detected_tool_info.get("tool_name", "")
-        tool_type = detected_tool_info.get("tool_type", "")
-
-        if not tool_name:
-            print("Could not detect an appropriate tool")
-            continue
-
-        print(f"\nDetected Tool: {tool_name} (Type: {tool_type})")
+        similar_tool = llm_embeddings.find_most_similar_tools(user_input, global_tool_embeddings, top_n=1)
+        tool_name = similar_tool[0][0]
 
         if not check_with_opa(tool=tool_name):
             print("Request blocked by OPA policy")
@@ -79,20 +71,3 @@ async def run_mcp_agent(mcp_agent: AssistantAgent, tool_detection_agent: Assista
                 cancellation_token=CancellationToken(),
             )
         )
-
-
-async def run_tool_agent(tool_detection_agent: AssistantAgent) -> dict:
-    response_text = await Console(tool_detection_agent.run_stream(
-        cancellation_token=CancellationToken()
-    ))
-    
-    response_text = str(response_text.messages[0].content).strip()
-
-    try:
-        match = re.search(r'\{.*\}', response_text, re.DOTALL)
-        if match:
-            return json.loads(match.group(0))
-    except json.JSONDecodeError:
-        print("JSON extraction failed. Raw output:\n", response_text)
-
-    return {"tool_name": "", "tool_type": ""}
