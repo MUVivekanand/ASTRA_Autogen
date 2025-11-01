@@ -1,0 +1,38 @@
+# Ignore Python virtual environments
+.venv/
+venv/
+
+# Ignore Git files
+.git/
+.gitignore
+
+# Ignore build and cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.log
+
+# Ignore environment and secret files
+.env
+.env.*
+*.pem
+*.crt
+*.key
+*.token.json
+
+# Ignore Docker-specific build artifacts
+Dockerfile
+docker-compose.yml
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
+*.swp
+
+# Ignore large local folders
+node_modules/
+dist/
+build/
+tmp/

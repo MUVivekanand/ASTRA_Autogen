@@ -4,7 +4,7 @@ from utils.runners import run_auth_agent, run_mcp_agent
 from utils.check import is_authenticated
 
 async def main() -> None:
-    """Main execution flow with three-phase system"""
+    """Main execution flow with two-phase system"""
     
     # --- Phase 1: Authentication ---
     if is_authenticated():

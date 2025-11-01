@@ -71,3 +71,21 @@ async def run_mcp_agent(mcp_agent: AssistantAgent):
                 cancellation_token=CancellationToken(),
             )
         )
+
+        # result = await Console(
+        #     mcp_agent.run_stream(
+        #         task=user_input,
+        #         cancellation_token=CancellationToken(),
+        #     )
+        # )
+
+        # messages = result.messages
+        
+        # final_response = "No response generated"
+        # for message in reversed(messages):
+        #     if (hasattr(message, 'type') and message.type == 'TextMessage' 
+        #         and hasattr(message, 'source') and message.source != 'user'):
+        #         final_response = message.content
+        #         break
+
+        # print("Response by runner: ", final_response)

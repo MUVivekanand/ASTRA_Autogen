@@ -6,6 +6,8 @@ from pymongo import MongoClient
 import os
 
 load_dotenv()
+    
+OPA_URL = os.getenv("OPA_URL", "http://localhost:8181")
 MONGO_URI = os.getenv("MONGO_URI")
 
 def check_with_opa(tool: str) -> bool:
@@ -48,7 +50,7 @@ def check_with_opa(tool: str) -> bool:
 
         print(f"\nSending to OPA: {input_data}")
         resp = requests.post(
-            "http://localhost:8181/v1/data/mcp_tools/allow",
+            f"{OPA_URL}/v1/data/mcp_tools/allow",
             json=input_data,
             timeout=5
         )

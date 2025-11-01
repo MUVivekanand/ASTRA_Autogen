@@ -1,0 +1,27 @@
+services:
+  opa:
+    image: openpolicyagent/opa:latest
+    command: ["run", "--server", "--addr=:8181", "/policies/policy.rego"]
+    volumes:
+      - ./policies:/policies
+    ports:
+      - "8181:8181"
+    networks:
+      - secure_net
+
+  mcp-framework:
+    build: .
+    depends_on:
+      - opa
+    env_file: ".env"
+    environment:
+      - DOCKER_ENV=true
+      - OPA_URL=http://opa:8181
+    networks:
+      - secure_net
+    tty: true
+    stdin_open: true
+
+networks:
+  secure_net:
+    driver: bridge
